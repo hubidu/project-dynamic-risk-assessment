@@ -1,40 +1,66 @@
 
+import re
 import pandas as pd
 import numpy as np
 import timeit
 import os
+from os.path import join
 import json
+import pickle
 
-##################Load config.json and get environment variables
 with open('config.json','r') as f:
     config = json.load(f) 
 
-dataset_csv_path = os.path.join(config['output_folder_path']) 
-test_data_path = os.path.join(config['test_data_path']) 
+dataset_csv_path = join(config['output_folder_path']) 
+test_data_path = join(config['test_data_path']) 
+prod_deployment_path = join(config['prod_deployment_path']) 
 
-##################Function to get model predictions
 def model_predictions():
     #read the deployed model and a test dataset, calculate predictions
-    return #return value should be a list containing all predictions
+    pd.read_csv(join(test_data_path, "testdata.csv"))
+    input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
+    model = pickle.load(open(join(prod_deployment_path, 'trainedmodel.pkl'), 'rb'))
+    return model.predict(input_data)
+
 
 ##################Function to get summary statistics
 def dataframe_summary():
     #calculate summary statistics here
-    return #return value should be a list containing all summary statistics
+    df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
+    df_numeric = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]]
+
+    return [df_numeric.mean(), df_numeric.median(), df_numeric.std()]
+
+
+##################Function to get missing values for all columns 
+def dataframe_missing():
+    #calculate summary statistics here
+    df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
+    return (df.isna().sum() / len(df)).values
+
 
 ##################Function to get timings
 def execution_time():
     #calculate timing of training.py and ingestion.py
-    return #return a list of 2 timing values in seconds
+    ingestion_time = timeit.timeit(os.system("python ingestion.py"))
+    training_time = timeit.timeit(os.system("python training.py"))
+    return [ingestion_time, training_time] 
+
 
 ##################Function to check dependencies
 def outdated_packages_list():
     #get a list of 
+    stream = os.popen('pip list --outdated')
+    output = stream.read()
+    lines = output.split("\n")[2:]
+
+    return [re.split(r"\s+", line)[:2] for line in lines]
 
 
 if __name__ == '__main__':
     model_predictions()
     dataframe_summary()
+    dataframe_missing()
     execution_time()
     outdated_packages_list()
 
