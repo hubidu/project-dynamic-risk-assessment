@@ -40,7 +40,7 @@ def score_model():
     record_score(f1)
 
     logging.info(f"Successfully scored model.")
-
+    return f1
 
 if __name__ == '__main__':
     score_model()

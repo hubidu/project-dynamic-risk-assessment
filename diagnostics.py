@@ -15,12 +15,16 @@ dataset_csv_path = join(config['output_folder_path'])
 test_data_path = join(config['test_data_path']) 
 prod_deployment_path = join(config['prod_deployment_path']) 
 
-def model_predictions():
+def model_predictions(input_data = None):
     #read the deployed model and a test dataset, calculate predictions
-    df = pd.read_csv(join(test_data_path, "testdata.csv"))
-    input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
+    y = None
+    # if input_data == None:
+    #     df = pd.read_csv(join(test_data_path, "testdata.csv"))
+    #     input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
+    #     y = df["exited"].values
+
     model = pickle.load(open(join(prod_deployment_path, 'trainedmodel.pkl'), 'rb'))
-    return model.predict(input_data)
+    return [model.predict(input_data), y]
 
 
 ##################Function to get summary statistics
@@ -29,14 +33,18 @@ def dataframe_summary():
     df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
     df_numeric = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]]
 
-    return [df_numeric.mean(), df_numeric.median(), df_numeric.std()]
+    return [
+        df_numeric.mean().round(decimals=2).values.tolist(), 
+        df_numeric.median().round(decimals=2).values.tolist(), 
+        df_numeric.std().round(decimals=2).values.tolist()
+    ]
 
 
 ##################Function to get missing values for all columns 
 def dataframe_missing():
     #calculate summary statistics here
     df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
-    return (df.isna().sum() / len(df)).values
+    return (df.isna().sum() / len(df)).values.tolist()
 
 
 ##################Function to get timings
