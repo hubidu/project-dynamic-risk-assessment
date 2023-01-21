@@ -17,7 +17,7 @@ prod_deployment_path = join(config['prod_deployment_path'])
 
 def model_predictions():
     #read the deployed model and a test dataset, calculate predictions
-    pd.read_csv(join(test_data_path, "testdata.csv"))
+    df = pd.read_csv(join(test_data_path, "testdata.csv"))
     input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
     model = pickle.load(open(join(prod_deployment_path, 'trainedmodel.pkl'), 'rb'))
     return model.predict(input_data)
@@ -42,8 +42,8 @@ def dataframe_missing():
 ##################Function to get timings
 def execution_time():
     #calculate timing of training.py and ingestion.py
-    ingestion_time = timeit.timeit(os.system("python ingestion.py"))
-    training_time = timeit.timeit(os.system("python training.py"))
+    ingestion_time = timeit.timeit(lambda: os.system("python ingestion.py"), number=1)
+    training_time = timeit.timeit(lambda: os.system("python training.py"), number=1)
     return [ingestion_time, training_time] 
 
 
