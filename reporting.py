@@ -1,8 +1,5 @@
-import pickle
-from sklearn.model_selection import train_test_split
-import pandas as pd
-import numpy as np
 from sklearn import metrics
+import pandas as pd
 import matplotlib.pyplot as plt
 import json
 import os
@@ -14,11 +11,11 @@ with open('config.json','r') as f:
 
 dataset_csv_path = os.path.join(config['output_folder_path']) 
 output_path = os.path.join(config['output_model_path']) 
+test_data_path = os.path.join(config['test_data_path']) 
 
-def score_model():
-    #calculate a confusion matrix using the test data and the deployed model
-    #write the confusion matrix to the workspace
-    y_pred, y = model_predictions()
+def calculate_confusion_matrix():
+    df = pd.read_csv(os.path.join(test_data_path, "testdata.csv"))
+    y_pred, y = model_predictions(df)
 
     cm = metrics.confusion_matrix(y, y_pred)
     disp = metrics.ConfusionMatrixDisplay(confusion_matrix=cm)
@@ -27,4 +24,4 @@ def score_model():
 
 
 if __name__ == '__main__':
-    score_model()
+    calculate_confusion_matrix()

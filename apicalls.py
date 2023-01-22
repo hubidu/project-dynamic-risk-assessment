@@ -1,5 +1,10 @@
 import requests
 import json
+import os
+with open('config.json','r') as f:
+    config = json.load(f) 
+
+output_model_path = os.path.join(config['output_model_path']) 
 
 URL = "http://127.0.0.1:8000/"
 
@@ -13,11 +18,11 @@ response4 = requests.get(f"{URL}diagnostics")
 print(response4.json())
 
 #combine all API responses
-# responses = response1.json() | response2.json() | response3.json() | response3.json()
+responses = response1.json() | response2.json() | response3.json() | response3.json()
 
 #write the responses to your workspace
-# with open('apireturns.txt', 'w') as convert_file:
-#      convert_file.write(json.dumps(responses))
+with open(os.path.join(output_model_path, 'apireturns.txt'), 'w') as convert_file:
+     convert_file.write(json.dumps(responses))
 
 
 

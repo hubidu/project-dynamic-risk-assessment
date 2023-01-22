@@ -13,20 +13,22 @@ with open('config.json','r') as f:
     config = json.load(f) 
 
 dataset_csv_path = os.path.join(config['output_folder_path']) 
+test_data_path = os.path.join(config['test_data_path']) 
+
 
 @app.route("/prediction", methods=['POST','OPTIONS'])
 def predict():        
     if request.method == 'POST':
         post_data = request.get_json()
         df = pd.DataFrame(post_data, index=[0])
-        X = df.values.reshape(-1, 3)
-        y_pred, y = model_predictions(X) 
+        y_pred, _ = model_predictions(df) 
         return jsonify({ "prediction": int(y_pred[0]) })
     
 
 @app.route("/scoring", methods=['GET','OPTIONS'])
 def score():        
-    return jsonify({ "score": score_model()}) 
+    testdata = pd.read_csv(os.path.join(test_data_path, "testdata.csv"))
+    return jsonify({ "score": score_model(testdata)}) 
 
 @app.route("/summarystats", methods=['GET','OPTIONS'])
 def summarystats():        

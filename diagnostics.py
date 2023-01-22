@@ -15,21 +15,17 @@ dataset_csv_path = join(config['output_folder_path'])
 test_data_path = join(config['test_data_path']) 
 prod_deployment_path = join(config['prod_deployment_path']) 
 
-def model_predictions(input_data = None):
-    #read the deployed model and a test dataset, calculate predictions
+def model_predictions(df: pd.DataFrame):
+    input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
     y = None
-    # if input_data == None:
-    #     df = pd.read_csv(join(test_data_path, "testdata.csv"))
-    #     input_data = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]].values.reshape(-1, 3)
-    #     y = df["exited"].values
+    if "exited" in df:
+        y = df["exited"].values
 
     model = pickle.load(open(join(prod_deployment_path, 'trainedmodel.pkl'), 'rb'))
     return [model.predict(input_data), y]
 
 
-##################Function to get summary statistics
 def dataframe_summary():
-    #calculate summary statistics here
     df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
     df_numeric = df[["lastmonth_activity", "lastyear_activity", "number_of_employees"]]
 
@@ -40,14 +36,12 @@ def dataframe_summary():
     ]
 
 
-##################Function to get missing values for all columns 
 def dataframe_missing():
     #calculate summary statistics here
     df = pd.read_csv(join(dataset_csv_path, "finaldata.csv"))
     return (df.isna().sum() / len(df)).values.tolist()
 
 
-##################Function to get timings
 def execution_time():
     #calculate timing of training.py and ingestion.py
     ingestion_time = timeit.timeit(lambda: os.system("python ingestion.py"), number=1)
@@ -55,7 +49,6 @@ def execution_time():
     return [ingestion_time, training_time] 
 
 
-##################Function to check dependencies
 def outdated_packages_list():
     #get a list of 
     stream = os.popen('pip list --outdated')
@@ -66,7 +59,9 @@ def outdated_packages_list():
 
 
 if __name__ == '__main__':
-    model_predictions()
+    df = pd.read_csv(join(test_data_path, "testdata.csv"))
+    model_predictions(df)
+
     dataframe_summary()
     dataframe_missing()
     execution_time()
