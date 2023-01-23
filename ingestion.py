@@ -1,8 +1,10 @@
 import pandas as pd
-from os import listdir, mkdir
-from os.path import join, isfile, exists
+import glob
+from os import mkdir
+from os.path import join, exists
 import json
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(message)s', filename='debug.log', level=logging.DEBUG)
 
 with open('config.json','r') as f:
@@ -37,8 +39,8 @@ def merge_multiple_dataframe():
     if (not exists(output_folder_path)):
         mkdir(output_folder_path)
 
-    datafiles = [f for f in listdir(input_folder_path) if isfile(join(input_folder_path, f)) and f.lower().endswith(".csv") ]
-    datafilepaths = [join(input_folder_path, f) for f in datafiles]
+    datafiles = glob.glob(f'*.csv', root_dir=input_folder_path)
+    datafilepaths = glob.glob(f'{input_folder_path}/*.csv')
 
     merged_df = merge_files(datafilepaths)
     

@@ -1,6 +1,7 @@
 import pandas as pd
 import ast
 import os
+import glob
 import json
 import pickle
 from sklearn.metrics import f1_score
@@ -24,7 +25,7 @@ def check_and_read_new_data():
         contents = f.read()
     ingested_files = ast.literal_eval(contents)
 
-    new_files = [f for f in os.listdir(input_folder_path) if os.path.isfile(os.path.join(input_folder_path, f)) and f.lower().endswith(".csv") ]
+    new_files = glob.glob(f'*.csv', root_dir=input_folder_path)
     
     new_files_to_process = set(new_files).difference(set(ingested_files)) 
 
