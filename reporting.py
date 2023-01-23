@@ -6,12 +6,13 @@ import os
 from diagnostics import model_predictions
 
 
-with open('config.json','r') as f:
-    config = json.load(f) 
+with open("config.json", "r") as f:
+    config = json.load(f)
 
-dataset_csv_path = os.path.join(config['output_folder_path']) 
-output_path = os.path.join(config['output_model_path']) 
-test_data_path = os.path.join(config['test_data_path']) 
+dataset_csv_path = os.path.join(config["output_folder_path"])
+output_path = os.path.join(config["output_model_path"])
+test_data_path = os.path.join(config["test_data_path"])
+
 
 def calculate_confusion_matrix():
     df = pd.read_csv(os.path.join(test_data_path, "testdata.csv"))
@@ -23,5 +24,5 @@ def calculate_confusion_matrix():
     plt.savefig(os.path.join(output_path, "confusionmatrix.png"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     calculate_confusion_matrix()
